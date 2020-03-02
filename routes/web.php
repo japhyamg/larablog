@@ -11,11 +11,14 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('index');
-
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/', 'PagesController@index')->name('index');
+Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
+Route::get('/post/{slug}', 'PagesController@show');
+
+
 Route::resource('posts', 'PostController');
+Route::namespace('Admin')->prefix('admin')->name('admin.')->middleware('can:manage-users')->group(function(){
+    Route::resource('/users', 'UsersController');
+});

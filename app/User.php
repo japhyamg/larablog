@@ -37,9 +37,39 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    // protected static function boot()
+    // {
+    //     parent::boot();
+    //     // $user->roles()->attach($role);
+    //     static::created(function($user){
+    //         $role = Role::select('id')->where('name','author')->first();
+    //         $user->roles()->attach($role);
+    //     });
+    // }
+
 
     public function posts()
     {
         return $this->hasMany('App\Post');
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany('App\Role');
+    }
+
+    public function hasAnyRoles($roles)
+    {
+        if($this->roles()->whereIn('name',$roles)->first()){
+            return true;
+        }
+        return false;
+    }
+    public function hasRole($role)
+    {
+        if($this->roles()->where('name',$role)->first()){
+            return true;
+        }
+        return false;
     }
 }

@@ -10,7 +10,7 @@
                 <p>{{$post->description}}</p>
             </div>
             <div class="card-footer">
-                <p class="d-flex justify-content-between"><span>Posted By: {{$post->user->name}}</span> <span>Posted: {{$post->created_at}} </span> </p>
+                <p class="d-flex justify-content-between"><span>Posted By: {{$post->user->name}}</span> <span>Posted: {{\Carbon\Carbon::parse($post->created_at)->diffForHumans()}} </span> </p>
             </div>
         </div>
     </div>

@@ -4,7 +4,15 @@
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card">
-            <div class="card-header justify-content-between">Dashboard <a class="btn btn-sm btn-info float-right" href="{{ url('/posts') }}">Posts</a></div>
+            <div class="card-header d-flex justify-content-between"> 
+                <div>Dashboard</div>
+                <div>
+                    @can('manage-users')
+                        <a class="btn btn-sm btn-info mr-1" href="{{ route('admin.users.index') }}">Users</a>
+                    @endcan
+                    <a class="btn btn-sm btn-info " href="{{ url('/posts') }}">Posts</a>
+                </div>
+            </div>
 
             <div class="card-body">
                 @if (session('status'))

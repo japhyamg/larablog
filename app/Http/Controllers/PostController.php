@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
 use App\Post;
 
 class PostController extends Controller
@@ -143,7 +144,9 @@ class PostController extends Controller
     {
         $post = Post::find($id);
         if($post){
+            Storage::disk('public')->delete($post->coverimage);
             $post->delete();
+            return redirect('/posts')->with('success','Post Deleted');
         }else{
             return redirect('/posts')->with('error','Select a post');
         }
