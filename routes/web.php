@@ -18,7 +18,7 @@ Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
 Route::get('/post/{slug}', 'PagesController@show');
 
 
-Route::resource('posts', 'PostController');
+Route::resource('posts', 'PostController')->middleware('can:manage-posts');
 Route::namespace('Admin')->prefix('admin')->name('admin.')->middleware('can:manage-users')->group(function(){
-    Route::resource('/users', 'UsersController');
+    Route::resource('/users', 'UsersController',['except'=>'show']);
 });

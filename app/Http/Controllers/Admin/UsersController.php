@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\User;
 use App\Role;
 use Illuminate\Http\Request;
-// use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use DivineOmega\LaravelPasswordExposedValidationRule\PasswordExposed;
+
 use Gate;
 
 
@@ -30,7 +33,8 @@ class UsersController extends Controller
      */
     public function create()
     {
-        //
+        $roles = Role::all();
+        return view('admin.users.create',compact('roles'));
     }
 
     /**
@@ -41,7 +45,28 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8'],
+            'roles' => ['required']
+        ]);
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+        ]);
+        $user->roles()->sync($data['roles']);
+
+        if($user){
+            $request->session()->flash('success','User Added');
+        }else{
+            $request->session()->flash('error','Error adding user');
+        }
+
+
+        return redirect()->route('admin.users.index');
     }
 
     /**
@@ -52,7 +77,7 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {
-        //
+        return('show');
     }
 
     /**
@@ -79,10 +104,16 @@ class UsersController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        $user->roles()->sync($request->roles);
         $user->name = $request->name;
         $user->email = $request->email;
-        $user->save();
-        $user->roles()->sync($request->roles);
+        if ($user->save()) {
+            $request->session()->flash('success','User Updated');
+        }else{
+            $request->session()->flash('error','Error updating user');
+        }
+
+
         return redirect()->route('admin.users.index');
     }
 
@@ -92,13 +123,17 @@ class UsersController extends Controller
      * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user)
     {
         // if(Gate::denies('delete-users')){
         //     return redirect()->route('admin.users.index');
         // }
         $user->roles()->detach();
-        $user->delete();
+        if($user->delete()){
+            $request->session()->flash('success','User Deleted');
+        }else{
+            $request->session()->flash('error','Error deleting user.');
+        }
         return redirect()->route('admin.users.index');
     }
 }

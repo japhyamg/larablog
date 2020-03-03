@@ -20,7 +20,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::orderBy('created_at','desc')->get();
+        $posts = Post::orderBy('created_at', 'desc')->get();
         return view('posts.index', compact('posts'));
     }
 
@@ -45,7 +45,7 @@ class PostController extends Controller
         $validatedData = $request->validate([
             'title' => ['required', 'max:255'],
             'description' => ['required'],
-            'coverimage' => ['required','image']
+            'coverimage' => ['required', 'image']
         ]);
 
         $slug = generate_slug($validatedData['title']);
@@ -63,7 +63,7 @@ class PostController extends Controller
             'description' => $validatedData['description'],
             'coverimage' => $coverimagePath
         ]);
-        return redirect('/posts')->with('success','Post Added');
+        return redirect('/posts')->with('success', 'Post Added');
     }
 
     /**
@@ -75,7 +75,7 @@ class PostController extends Controller
     public function show($id)
     {
         $post = Post::findOrFail($id);
-        return view('posts.show',compact('post'));
+        return view('posts.show', compact('post'));
     }
 
     /**
@@ -87,10 +87,10 @@ class PostController extends Controller
     public function edit($id)
     {
         $post = Post::find($id);
-        if($post){
+        if ($post) {
             return view('posts.edit', compact('post'));
-        }else{
-            return redirect('/posts')->with('error','Select a post');
+        } else {
+            return redirect('/posts')->with('error', 'Select a post');
         }
     }
 
@@ -104,33 +104,33 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         $post = Post::find($id);
-        if($post){
+        if ($post) {
             $validatedData = $request->validate([
                 'title' => ['required', 'max:255'],
                 'description' => ['required']
             ]);
-    
+
             $coverimagePath = null;
-    
-            if(request('coverimage')){
+
+            if (request('coverimage')) {
                 // delete previous cover image
                 $coverimagePath = request('coverimage')->store('coverimages', 'public');
-        
+
                 $image = Image::make(public_path("/storage/{$coverimagePath}"))->resize(270, 200);
                 $image->save();
             }
-    
+
             $slug = generate_slug($validatedData['title']);
-    
+
             $post->update([
                 'title' => $validatedData['title'],
                 'slug' => $slug,
                 'description' => $validatedData['description'],
                 'coverimage' => $coverimagePath ? $coverimagePath : $post->coverimage
             ]);
-            return redirect('/posts')->with('success','Post Updated');
-        }else{
-            return redirect('/posts')->with('error','Select a post');
+            return redirect('/posts')->with('success', 'Post Updated');
+        } else {
+            return redirect('/posts')->with('error', 'Select a post');
         }
     }
 
@@ -143,12 +143,12 @@ class PostController extends Controller
     public function destroy($id)
     {
         $post = Post::find($id);
-        if($post){
+        if ($post) {
             Storage::disk('public')->delete($post->coverimage);
             $post->delete();
-            return redirect('/posts')->with('success','Post Deleted');
-        }else{
-            return redirect('/posts')->with('error','Select a post');
+            return redirect('/posts')->with('success', 'Post Deleted');
+        } else {
+            return redirect('/posts')->with('error', 'Select a post');
         }
     }
 }
